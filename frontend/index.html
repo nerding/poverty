@@ -1,0 +1,84 @@
+<doctype html>
+<html>
+<head>
+	<title>poverty</title>
+
+	<link rel="stylesheet" href="/css/style.css" />
+
+	<script src="/js/jquery-2.1.0.min.js"></script>
+	<script src="/js/spreadsheet.js"></script>
+</head>
+<body>
+
+<div class="container">
+	<header>
+		<h1>poverty</h1>
+	</header>
+
+	<div id="income">
+		<h2>income</h2>
+		<table>
+			<tr>
+				<th>date</th>
+				<th>name</th>
+				<th>amount</th>
+				<th><a href="#addIncome" id="toggleIncomeForm">+</a></th>
+			</tr>
+
+			<tr id="20140101-pay-day">
+				<td>01/01/2014</td>
+				<td>pay day</td>
+				<td>$1234</td>
+				<td><a href="#rm" class="rmIncome" item="20140101-pay-day">-</a></td>
+			</tr>
+		</table>
+	</div>
+
+	<div id="expense">
+		<h2>expenses</h2>
+
+		<table id="purchases">
+			<tr class="head">
+				<th>Date</th>
+				<th>Name</th>
+				<th>Price</th>
+				<th>Tags</th>
+				<th><a href="#add" id="addItem">+</a></th>
+			</tr>
+
+			<tr id="newItemRow">
+			<form id="newItem">
+				<td><input type="date" placeholder="date" id="newItemDate" /></td>
+				<td><input type="text" placeholder="name" id="newItemName" /></td>
+				<td>$<input type="text" placeholder="price" id="newItemPrice" /></td>
+				<td><input type="text" placeholder="tags" id="newItemTags" /></td>
+				<td><input type="submit" id="newItemSubmit" value="+" /></td>
+			</form>
+			</tr>
+
+			<tr id="20140101-blarg">
+				<td>01/01/2014</td>
+				<td>Blarg'n'stuffs</td>
+				<td>$19.47</td>
+				<td>
+					<span class="tag">blarg</span>
+					<span class="tag">stuff</span>
+				</td>
+				<td><a href="#rm" class="rm-item" item="20140101-blarg">-</a></td>
+			</tr>
+
+			<tr id="20140507-mein">
+				<td>05/07/2014</td>
+				<td>Mein Stuffs</td>
+				<td>$18.71</td>
+				<td>
+					<span class="tag">german</span>
+					<span class="tag">stuff</span>
+				</td>
+				<td><a href="#rm" class="rm-item" item="20140507-mein">-</a></td>
+			</tr>
+		</table>
+	</div>
+</div>
+</body>
+</html>
