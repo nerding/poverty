@@ -142,6 +142,14 @@ var addItem = function(item) {
 				alert("Couldn't remove. Everything's terrible...");
 			} else {
 				$("#" + id).remove();
+
+				for (var i = 0; i < transactions.length; i++) {
+					var curid = (item.date + " " + item.name).replace(/\s+/g, '-');
+					if (curid === id) {
+						transactions.splice(i, 1);
+						break;
+					}
+				}
 			}
 		})
 
