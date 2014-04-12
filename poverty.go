@@ -9,6 +9,7 @@ import (
 	"strings"
 	"log"
 	"strconv"
+	"time"
 )
 
 type Data struct{
@@ -52,7 +53,7 @@ func main(){
 	m := martini.Classic()
 	m.Use(martini.Static("frontend", martini.StaticOptions{Prefix: "/"}))
 
-	m.Get("/data/get", func(params martini.Params, r *http.Request) string {
+	m.Get("/data/get", func(params martini.Params, r *http.Request, res http.ResponseWriter) string {
 		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ?", r.FormValue("uname"))
 		if err != nil {
 			log.Println("DATA:GET ERROR Could not query database for data.")
@@ -93,6 +94,13 @@ func main(){
 		rows.Close()
 
 		e, _ := json.Marshal(data)
+
+		if(r.FormValue("uname") != ""){
+			expires := time.Now().AddDate(0, 0, 7)
+			raw := "user=" + r.FormValue("uname")
+			cookie := http.Cookie{"user", r.FormValue("uname"), "/", "www.sliceone.com", expires, expires.Format(time.UnixDate), 86400, true, true, raw, []string{raw}}
+			http.SetCookie(res, &cookie)
+		}
 
 		return string(e)
 	})
