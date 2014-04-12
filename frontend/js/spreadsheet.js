@@ -4,8 +4,13 @@ var categories = [];
 var budgets = [];
 
 $(document).ready(function() {
-	// TODO: make a better login thing...
-	currentUser = prompt("username");
+	if (localStorage.getItem("user") === null) {
+		// TODO: make a better login thing...
+		currentUser = prompt("username");
+		localStorage.setItem("user", currentUser);
+	} else {
+		currentUser = localStorage.getItem("user");
+	}
 
 	// get transactions
 	getInfo();
