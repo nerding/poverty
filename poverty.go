@@ -99,7 +99,7 @@ func main(){
 		cats := strings.Split(r.FormValue("categories"), ",")
 
 		for _, cat := range cats{
-			_, err = db.Exec("INSERT INTO categories VALUES(?, ?)", id, cat)
+			_, err = db.Exec("INSERT INTO categories VALUES(?, ?)", id, strings.TrimSpace(cat))
 			if err != nil {
 				panic(err)
 			}
