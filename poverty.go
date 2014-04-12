@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"encoding/json"
 	"strings"
-	"fmt"
+	"log"
+	"strconv"
 )
 
 type Data struct{
@@ -29,23 +30,23 @@ func main(){
 
 	db, err := sql.Open("sqlite3", "./poverty.db")
 	if err != nil {
-		panic(err)
+		log.Fatal("Could not connect to database.")
 	}
 	defer db.Close()
 
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY, uname TEXT, date INT, iname TEXT, amount REAL)")
 	if err != nil {
-		panic(err)
+		log.Fatal("Could not create data table in database.")
 	}
 
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS categories (tid INTEGER, cname TEXT)")
 	if err != nil {
-		panic(err)
+		log.Fatal("Could not create categories table in database.")
 	}
 
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS budgets (uname TEXT, cname TEXT, amount REAL)")
 	if err != nil {
-		panic(err)
+		log.Fatal("Could not create budgets table in database.")
 	}
 
 	m := martini.Classic()
@@ -115,8 +116,8 @@ func main(){
 				panic(err)
 			}
 		}
-
-		return "probably added."
+		
+		return "[{\"id\":" + strconv.FormatInt(id, 10) + "}]"
 	})
 
 	m.Get("/data/remove", func(params martini.Params, r *http.Request) string {
@@ -183,7 +184,6 @@ func main(){
 				bud.Cname = r.FormValue("cname")
 
 				err = rows.Scan(&bud.Amount)
-				fmt.Println(bud.Amount)
 				if err != nil {
 					panic(err)
 				}
