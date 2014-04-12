@@ -28,7 +28,7 @@ $(document).ready(function() {
 			uname: currentUser
 		};
 
-		$.get("/data/add", nItem, function(data) {});
+		$.get("/data/add", nItem, function() {});
 
 		var cats = nItem.categories.split(',');
 		$.each(cats, function(i, cat) {
@@ -121,7 +121,7 @@ var addItem = function(item) {
 
 	var tags = $("<td/>");
 	$.each(item.categories, function(i, tag) {
-		var link = $("<a/>", {class: "tag", href: "#filter"}).text(tag)
+		var link = $("<a/>", {class: "tag", href: "#filter"}).text(tag);
 		tags.append(link);
 		tags.append("&nbsp;");
 
@@ -151,9 +151,9 @@ var addItem = function(item) {
 					}
 				}
 			}
-		})
+		});
 
-	})
+	});
 
 	row.append($("<td/>").append(killer));
 
@@ -191,7 +191,7 @@ var getInfo = function() {
 
 		fillBudgetTable();
 	});
-}
+};
 
 var fillCategories = function() {
 	$("#budgetCategories").html("");
@@ -203,7 +203,7 @@ var fillCategories = function() {
 	$.each(categories, function(i, cat) {
 		$("<option/>", {value: cat}).text(cat).appendTo($("#budgetCategories"));
 	});
-}
+};
 
 var fillBudgetTable = function() {
 	$("#budgetTable tbody").html("");
@@ -230,14 +230,14 @@ var fillBudgetTable = function() {
 
 					fillBudgetTable();
 				}
-			})
+			});
 		});
 
 		row.append($("<td/>").append(link));
 
 		row.appendTo("#budgetTable tbody");
 	});
-}
+};
 
 
 var filterTransactions = function(tag) {
@@ -247,7 +247,7 @@ var filterTransactions = function(tag) {
 			addItem(item);
 		}
 	});
-}
+};
 
 
 var showTab = function(section) {
@@ -255,7 +255,7 @@ var showTab = function(section) {
 
 	$("#tabs").find('section').each(function(i, tab) { $(tab).hide(); });
 	$(section).show();
-}
+};
 
 window.onpopstate = function() {
 	if (window.location.hash !== "") {
@@ -263,4 +263,4 @@ window.onpopstate = function() {
 	} else {
 		showTab("#transactions");
 	}
-}
+};
