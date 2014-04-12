@@ -1,4 +1,10 @@
+var currentUser;
+
 $(document).ready(function() {
+	currentUser = prompt("username");
+
+	fillTable();
+
 	// setup the add new item stuff
 	$("#addItem").click(function(event) {
 		event.preventDefault();
@@ -10,29 +16,25 @@ $(document).ready(function() {
 		event.preventDefault();
 
 		var nItem = {
-			date: $("#newItemDate").val(),
-			name: $("#newItemName").val(),
-			price: $("#newItemPrice").val(),
-			tags: $("#newItemTags").val()
+			date: (new Date($("#newItemDate").val())).getTime(),
+			iname: $("#newItemName").val(),
+			amount: $("#newItemPrice").val(),
+			categories: $("#newItemTags").val(),
+			uname: currentUser
 		};
+
+		$.get("/data/add", nItem, function(data) {
+			//setTable(data);
+			fillTable();
+		})
+
 
 		$("#newItemDate").val("");
 		$("#newItemName").val("");
 		$("#newItemPrice").val("");
 		$("#newItemTags").val("");
 
-		addItem(nItem);
 		$("#newItemRow").hide();
-	});
-
-
-	$('.rm-item').each(function(i, iter) {
-		$(iter).click(function(event) {
-			event.preventDefault();
-
-			//alert("delete item: " + $(iter).attr('item'))
-			$("#" + $(iter).attr('item')).remove();
-		});
 	});
 });
 
@@ -43,12 +45,19 @@ var addItem = function(item) {
 
 	var row = $("<tr/>", {id: id});
 	row.append($("<td/>").text(item.date));
-	row.append($("<td/>").text(item.name));
-	row.append($("<td/>").text("$" + item.price));
+	row.append($("<td/>").text(item.iname));
+	row.append($("<td/>").text("$" + item.amount));
 
 	// TODO: separate out tags into an array (take string, separate on commas).
 	//		 with separated tags, add them to spans, see HTML page for details.
-	row.append($("<td/>").text(item.tags));
+	var tags = $("<td/>");
+	$.each(item.categories, function(i, tag) {
+		tags.append($("<span/>", {class: "tag"}).text(tag));
+		tags.append("&nbsp;");
+	});
+
+	row.append(tags);
+
 
 	var killer = $("<a/>", {href: "#rm", item: id}).text("-");
 	killer.click(function(event) {
@@ -59,4 +68,12 @@ var addItem = function(item) {
 	row.append($("<td/>").append(killer));
 
 	row.appendTo($("#purchases"));
+}
+
+var fillTable = function() {
+	$.getJSON('/data/get', { uname: currentUser }, function(data) {
+		$.each(data, function(i, item) {
+			addItem(item);
+		});
+	});
 }

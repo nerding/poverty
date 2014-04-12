@@ -38,6 +38,7 @@ func main(){
 	}
 
 	m := martini.Classic()
+	m.Use(martini.Static("frontend", martini.StaticOptions{Prefix: "/"}))
 
 	m.Get("/data/get", func(params martini.Params, r *http.Request) string {
 		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ?", r.FormValue("uname"))
