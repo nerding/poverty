@@ -15,29 +15,8 @@
 		<h1>poverty</h1>
 	</header>
 
-	<div id="income">
-		<h2>income</h2>
-		<table>
-			<tr>
-				<th>date</th>
-				<th>name</th>
-				<th>amount</th>
-				<th><a href="#addIncome" id="toggleIncomeForm">+</a></th>
-			</tr>
-
-			<tr id="20140101-pay-day">
-				<td>01/01/2014</td>
-				<td>pay day</td>
-				<td>$1234</td>
-				<td><a href="#rm" class="rmIncome" item="20140101-pay-day">-</a></td>
-			</tr>
-		</table>
-	</div>
-
-	<div id="expense">
-		<h2>expenses</h2>
-
-		<table id="purchases">
+	<table id="purchases">
+		<thead>
 			<tr class="head">
 				<th>Date</th>
 				<th>Name</th>
@@ -55,8 +34,10 @@
 				<td><input type="submit" id="newItemSubmit" value="+" /></td>
 			</form>
 			</tr>
-		</table>
-	</div>
+		</thead>
+
+		<tbody></tbody>
+	</table>
 </div>
 </body>
 </html>
