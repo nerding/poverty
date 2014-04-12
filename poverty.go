@@ -214,7 +214,7 @@ func main(){
 	m.Get("/budget/remove", func(params martini.Params, r *http.Request) string {
 		ret := "\"SUCCESS\""
 
-		_, err = db.Exec("DELETE FROM budgets WHERE uname=? AND cname=?", r.FormValue("uname"), r.FormValue("category"))
+		_, err = db.Exec("DELETE FROM budgets WHERE uname=? AND cname=?", r.FormValue("uname"), r.FormValue("cname"))
 		if err != nil {
 			log.Println("BUDGET:REMOVE ERROR Could not remove requested budget.")
 			ret = "\"FAIL\""
