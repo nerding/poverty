@@ -1,0 +1,100 @@
+
+// colors
+$white:         hsl(220, 23%, 98%);
+
+$main:          hsl(190, 50%, 50%);
+$dark:          hsl(190, 50%, 30%);
+$darker:        hsl(190, 50%, 10%);
+$light:         hsl(190, 50%, 70%);
+$lighter:       hsl(190, 50%, 90%);
+
+$text:          hsl(221, 16%, 30%);
+$links:         hsl(221, 16%, 10%);
+
+$green:         hsl( 92, 28%, 75%);
+$dark-green:    hsl( 92, 28%, 55%);
+
+// sizes
+$padding: 1em;
+
+// fonts
+$font-title:   "Source Sans Pro", sans-serif;
+$font-body:  "Source Code Pro", monospace;
+$font-size:   18px;
+
+$line-height:  1.7em;
+
+// fonts imports
+@import "http://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,600,900";
+
+body {
+	padding: 0;
+	margin: 0;
+
+	font-family: $font-body;
+	font-size: $font-size;
+	line-height: $line-height;
+	font-weight: 300;
+
+	color: $text;
+}
+
+h1 {
+	font-weight: 900;
+	line-height: 1.2em;
+}
+
+.container {
+	width: 80%;
+	max-width: 1000px;
+	min-width: 800px;
+
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+header {
+	border-bottom: 5px solid $darker;
+
+	h1 {
+		line-height: 1em;
+		padding: 0;
+		margin: 20px 0;
+		text-align: center;
+	}
+}
+
+table {
+	width: 100%;
+
+	th {
+		border-bottom: 2px solid $text;
+		text-align: left;
+	}
+
+	td, th {
+		padding: 5px;
+	}
+}
+
+.tag {
+	background: $green;
+	color: $white;
+	display: inline-block;
+	border-radius: 3px;
+	padding: 2px;
+}
+
+#newItemRow {
+	display: none;
+}
+
+#income {
+	width: 30%;
+	float: left;
+}
+
+#expense {
+	width: 65%;
+	float: right;
+}
