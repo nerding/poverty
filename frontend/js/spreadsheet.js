@@ -1,13 +1,15 @@
 var currentUser;
 var transactions = [];
+var categories = [];
+var budgets = [];
 
 $(document).ready(function() {
 	// TODO: make a better login thing...
 	currentUser = prompt("username");
 
 	// get transactions
-	getTransactionInfo();
-	
+	getInfo();
+
 	// setup the add new item stuff
 	$("#addItem").click(function(event) {
 		event.preventDefault();
@@ -27,7 +29,20 @@ $(document).ready(function() {
 		};
 
 		$.get("/data/add", nItem, function(data) {});
-		transactions.append(nItem);
+		transactions.push(nItem);
+
+		var cats = nItem.categories.split(',');
+		$.each(cats, function(i, cat) {
+			cat = cat.trim();
+
+			if ($.inArray(cat, categories) === -1) {
+				categories.push(cat);
+			}
+		});
+
+		categories.sort();
+		fillCategories();
+
 		fillTable();
 
 
@@ -38,6 +53,58 @@ $(document).ready(function() {
 
 		$("#newItemRow").hide();
 	});
+
+
+	// setup and add new budget stuff
+	$("#toggleBudgetForm").click(function(event) {
+		event.preventDefault();
+		$("#newBudgetRow").toggle();
+	});
+
+	$("#newBudget").submit(function(event) {
+		event.preventDefault();
+
+		if ($("budgetCategories").val() === "--") {
+			alert("Please select a category");
+			return;
+		}
+
+		var nBudget = {
+			uname: currentUser,
+			cname: $("#budgetCategories").val(),
+			amount: $("#budgetBudget").val()
+		};
+
+		$.get('/budget/add', nBudget, function(data) {
+			if (data !== "probably added.") {
+				alert("no confirmation on adding budget. everything is terrible.");
+			} else {
+				budgets.push(nBudget);
+				fillBudgetTable();
+			}
+		});
+
+
+		$("#budgetBudget").val("");
+		$("#budgetCategories").val("--");
+		$("#newBudgetRow").hide();
+	});
+
+
+	// navigation/tabs things
+	$("nav ul").find("a").each(function(i, link) {
+		$(link).on('click', function(event) {
+		
+			event.preventDefault();
+			showTab($(link).attr('href'));
+			history.pushState(null, $(link).attr('href'), $(link).attr('href'));
+		});
+	});
+
+	showTab('#transactions');
+	if (window.location.hash) {
+		showTab(window.location.hash);
+	}
 });
 
 
@@ -85,10 +152,64 @@ var fillTable = function() {
 	});
 };
 
-var getTransactionInfo = function() {
-	result = $.getJSON('/data/get', { uname: currentUser }, function(data) {
+var getInfo = function() {
+	$.getJSON('/data/get', { uname: currentUser }, function(data) {
 		transactions = data;
+
+		$.each(transactions, function(i, item) {
+			$.each(item.categories, function(j, cat) {
+				if ($.inArray(cat, categories) === -1) {
+					categories.push(cat);
+				}
+			});
+		});
+
+		categories.sort();
+		fillCategories();
 
 		fillTable();
 	});
+
+	$.getJSON('/budget/get', { uname: currentUser, all: "true" }, function(data) {
+		budgets = data;
+
+		fillBudgetTable();
+	});
+}
+
+var fillCategories = function() {
+	$("#budgetCategories").html("");
+
+	categories.sort();
+
+	$("<option/>", {value: "--"}).text("--").appendTo($("#budgetCategories"));
+
+	$.each(categories, function(i, cat) {
+		$("<option/>", {value: cat}).text(cat).appendTo($("#budgetCategories"));
+	});
+}
+
+var fillBudgetTable = function() {
+	$("#budgetTable tbody").html("");
+
+	$.each(budgets, function(i, budget) {
+		var row = $("<tr/>");
+		row.append($("<td/>").text(budget.cname));
+		row.append($("<td/>").text("$" + budget.amount));
+		row.appendTo("#budgetTable tbody");
+	});
+}
+
+
+var showTab = function(section) {
+	$("#tabs").find('section').each(function(i, tab) { $(tab).hide(); });
+	$(section).show();
+}
+
+window.onpopstate = function() {
+	if (window.location.hash) {
+		showTab(window.location.hash);
+	} else {
+		showTab("#home");
+	}
 }

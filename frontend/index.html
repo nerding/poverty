@@ -22,29 +22,55 @@
 		</nav>
 	</header>
 
-	<table id="purchases">
-		<thead>
-			<tr class="head">
-				<th>Date</th>
-				<th>Name</th>
-				<th>Price</th>
-				<th>Tags</th>
-				<th><a href="#add" id="addItem">+</a></th>
-			</tr>
+	<div id="tabs">
+	<section id="transactions">
+		<table id="purchases">
+			<thead>
+				<tr class="head">
+					<th>Date</th>
+					<th>Name</th>
+					<th>Price</th>
+					<th>Tags</th>
+					<th><a href="#add" id="addItem">+</a></th>
+				</tr>
 
-			<tr id="newItemRow">
-			<form id="newItem">
-				<td><input type="date" placeholder="date" id="newItemDate" /></td>
-				<td><input type="text" placeholder="name" id="newItemName" /></td>
-				<td>$<input type="text" placeholder="price" id="newItemPrice" /></td>
-				<td><input type="text" placeholder="tags" id="newItemTags" /></td>
-				<td><input type="submit" id="newItemSubmit" value="+" /></td>
-			</form>
-			</tr>
-		</thead>
+				<tr id="newItemRow">
+				<form id="newItem">
+					<td><input type="date" placeholder="date" id="newItemDate" /></td>
+					<td><input type="text" placeholder="name" id="newItemName" /></td>
+					<td>$<input type="text" placeholder="price" id="newItemPrice" /></td>
+					<td><input type="text" placeholder="tags" id="newItemTags" /></td>
+					<td><input type="submit" id="newItemSubmit" value="+" /></td>
+				</form>
+				</tr>
+			</thead>
 
-		<tbody></tbody>
-	</table>
+			<tbody></tbody>
+		</table>
+	</section>
+
+	<section id="budget">
+		<table id="budgetTable">
+			<thead>
+				<tr>
+					<th>category</th>
+					<th>budget</th>
+					<th><a href="#add" id="toggleBudgetForm">+</a></th>
+				<tr>
+
+				<tr id="newBudgetRow">
+				<form id="newBudget">
+					<td><select id="budgetCategories"></select></td>
+					<td><input type="number" id="budgetBudget" placeholder="amount" step="any" /></td>
+					<td><input type="submit" value="+" /></td>
+				</form>
+				</tr>
+			</thead>
+
+			<tbody></tbody>
+		</tabel>
+	</section>
+	</div>
 </div>
 </body>
 </html>

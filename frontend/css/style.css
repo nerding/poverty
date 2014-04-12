@@ -42,13 +42,5 @@ table {
   border-radius: 3px;
   padding: 2px; }
 
-#newItemRow {
+#newItemRow, #newBudgetRow {
   display: none; }
-
-#income {
-  width: 30%;
-  float: left; }
-
-#expense {
-  width: 65%;
-  float: right; }
