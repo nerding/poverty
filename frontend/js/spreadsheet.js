@@ -106,6 +106,14 @@ $(document).ready(function() {
 		});
 	});
 
+	$("#changeUser").on('click', function(event) {
+		event.preventDefault();
+		currentUser = prompt("username");
+		localStorage.setItem("user", currentUser);
+
+		getInfo();
+	});
+
 	//showTab('#transactions');
 	if (window.location.hash !== "") {
 		showTab(window.location.hash);
@@ -174,6 +182,10 @@ var fillTable = function() {
 };
 
 var getInfo = function() {
+	transactions = [];
+	categories = [];
+	budgets = [];
+
 	$.getJSON('/data/get', { uname: currentUser }, function(data) {
 		transactions = data;
 
