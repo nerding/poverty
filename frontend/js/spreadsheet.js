@@ -1,8 +1,10 @@
 var currentUser;
 
 $(document).ready(function() {
+	// TODO: make a better login thing...
 	currentUser = prompt("username");
 
+	// grab all data for currentUser and put on screen
 	fillTable();
 
 	// setup the add new item stuff
@@ -44,12 +46,10 @@ var addItem = function(item) {
 	id = id.replace(/\s+/g, '-');
 
 	var row = $("<tr/>", {id: id});
-	row.append($("<td/>").text(item.date));
+	row.append($("<td/>").text( (new Date(item.date)).toISOString().substring(0, 10) ));
 	row.append($("<td/>").text(item.iname));
 	row.append($("<td/>").text("$" + item.amount));
 
-	// TODO: separate out tags into an array (take string, separate on commas).
-	//		 with separated tags, add them to spans, see HTML page for details.
 	var tags = $("<td/>");
 	$.each(item.categories, function(i, tag) {
 		tags.append($("<span/>", {class: "tag"}).text(tag));
@@ -67,13 +67,15 @@ var addItem = function(item) {
 
 	row.append($("<td/>").append(killer));
 
-	row.appendTo($("#purchases"));
-}
+	row.appendTo($("#purchases tbody"));
+};
 
 var fillTable = function() {
+	$("#purchases tbody").html("");
+
 	$.getJSON('/data/get', { uname: currentUser }, function(data) {
 		$.each(data, function(i, item) {
 			addItem(item);
 		});
 	});
-}
+};
