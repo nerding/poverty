@@ -29,7 +29,6 @@ $(document).ready(function() {
 		};
 
 		$.get("/data/add", nItem, function(data) {});
-		transactions.push(nItem);
 
 		var cats = nItem.categories.split(',');
 		$.each(cats, function(i, cat) {
@@ -39,7 +38,8 @@ $(document).ready(function() {
 				categories.push(cat);
 			}
 		});
-
+		nItem.categories = cats;
+		transactions.push(nItem);
 		categories.sort();
 		fillCategories();
 
@@ -101,9 +101,11 @@ $(document).ready(function() {
 		});
 	});
 
-	showTab('#transactions');
-	if (window.location.hash) {
+	//showTab('#transactions');
+	if (window.location.hash !== "") {
 		showTab(window.location.hash);
+	} else {
+		showTab('#transactions');
 	}
 });
 
@@ -119,8 +121,14 @@ var addItem = function(item) {
 
 	var tags = $("<td/>");
 	$.each(item.categories, function(i, tag) {
-		tags.append($("<span/>", {class: "tag"}).text(tag));
+		var link = $("<a/>", {class: "tag", href: "#filter"}).text(tag)
+		tags.append(link);
 		tags.append("&nbsp;");
+
+		link.on('click', function(event) {
+			event.preventDefault();
+			filterTransactions(tag);
+		});
 	});
 
 	row.append(tags);
@@ -134,6 +142,14 @@ var addItem = function(item) {
 				alert("Couldn't remove. Everything's terrible...");
 			} else {
 				$("#" + id).remove();
+
+				for (var i = 0; i < transactions.length; i++) {
+					var curid = (item.date + " " + item.name).replace(/\s+/g, '-');
+					if (curid === id) {
+						transactions.splice(i, 1);
+						break;
+					}
+				}
 			}
 		})
 
@@ -201,15 +217,27 @@ var fillBudgetTable = function() {
 }
 
 
+var filterTransactions = function(tag) {
+	$("#purchases tbody").html("");
+	$.each(transactions, function(i, item) {
+		if ($.inArray(tag, item.categories) !== -1) {
+			addItem(item);
+		}
+	});
+}
+
+
 var showTab = function(section) {
+	fillTable();
+
 	$("#tabs").find('section').each(function(i, tab) { $(tab).hide(); });
 	$(section).show();
 }
 
 window.onpopstate = function() {
-	if (window.location.hash) {
+	if (window.location.hash !== "") {
 		showTab(window.location.hash);
 	} else {
-		showTab("#home");
+		showTab("#transactions");
 	}
 }

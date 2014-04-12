@@ -83,6 +83,11 @@ table {
 	display: inline-block;
 	border-radius: 3px;
 	padding: 2px;
+	text-decoration: none;
+
+	&:hover {
+		background: $dark-green;
+	}
 }
 
 #newItemRow, #newBudgetRow {
