@@ -1,12 +1,13 @@
 var currentUser;
+var transactions = [];
 
 $(document).ready(function() {
 	// TODO: make a better login thing...
 	currentUser = prompt("username");
 
-	// grab all data for currentUser and put on screen
-	fillTable();
-
+	// get transactions
+	getTransactionInfo();
+	
 	// setup the add new item stuff
 	$("#addItem").click(function(event) {
 		event.preventDefault();
@@ -25,10 +26,9 @@ $(document).ready(function() {
 			uname: currentUser
 		};
 
-		$.get("/data/add", nItem, function(data) {
-			//setTable(data);
-			fillTable();
-		})
+		$.get("/data/add", nItem, function(data) {});
+		transactions.append(nItem);
+		fillTable();
 
 
 		$("#newItemDate").val("");
@@ -62,7 +62,14 @@ var addItem = function(item) {
 	var killer = $("<a/>", {href: "#rm", item: id}).text("-");
 	killer.click(function(event) {
 		event.preventDefault();
-		$("#" + id).remove();
+		$.get("/data/remove", {id: item.id}, function(data) {
+			if (data !== "probably removed.") {
+				alert("Couldn't remove. Everything's terrible...");
+			} else {
+				$("#" + id).remove();
+			}
+		})
+
 	})
 
 	row.append($("<td/>").append(killer));
@@ -73,9 +80,15 @@ var addItem = function(item) {
 var fillTable = function() {
 	$("#purchases tbody").html("");
 
-	$.getJSON('/data/get', { uname: currentUser }, function(data) {
-		$.each(data, function(i, item) {
-			addItem(item);
-		});
+	$.each(transactions, function(i, item) {
+		addItem(item);
 	});
 };
+
+var getTransactionInfo = function() {
+	result = $.getJSON('/data/get', { uname: currentUser }, function(data) {
+		transactions = data;
+
+		fillTable();
+	});
+}
