@@ -110,7 +110,7 @@ func main(){
 		cats := strings.Split(r.FormValue("categories"), ",")
 
 		for _, cat := range cats{
-			_, err = db.Exec("INSERT INTO categories VALUES(?, ?)", id, strings.TrimSpace(cat))
+			_, err = db.Exec("INSERT INTO categories (tid, cname) SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM categories WHERE tid=? AND cname=?);", id, strings.TrimSpace(cat), id, strings.TrimSpace(cat))
 			if err != nil {
 				panic(err)
 			}
@@ -119,8 +119,17 @@ func main(){
 		return "probably added."
 	})
 
+	m.Get("/data/remove", func(params martini.Params, r *http.Request) string {
+		_, err := db.Exec("DELETE FROM data WHERE id=?", r.FormValue("id"))
+		if err != nil {
+			panic(err)
+		}
+
+		return "probably removed."
+	})
+
 	m.Get("/budget/add", func(params martini.Params, r *http.Request) string {
-		_, err = db.Exec("INSERT INTO budgets VALUES(?, ?, ?)", r.FormValue("uname"), r.FormValue("cname"), r.FormValue("amount"))
+		_, err = db.Exec("INSERT INTO budgets (uname, cname, amount) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM budgets WHERE uname=? AND cname=?);", r.FormValue("uname"), r.FormValue("cname"), r.FormValue("amount"), r.FormValue("uname"), r.FormValue("cname"))
 		if err != nil {
 			panic(err)
 		}
