@@ -40,7 +40,10 @@ table {
   color: #f9fafb;
   display: inline-block;
   border-radius: 3px;
-  padding: 2px; }
+  padding: 2px;
+  text-decoration: none; }
+  .tag:hover {
+    background: #8aac6c; }
 
 #newItemRow, #newBudgetRow {
   display: none; }
