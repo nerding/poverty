@@ -212,6 +212,29 @@ var fillBudgetTable = function() {
 		var row = $("<tr/>");
 		row.append($("<td/>").text(budget.cname));
 		row.append($("<td/>").text("$" + budget.amount));
+
+		var link = $("<a/>", {href: "#"}).text("-");
+		link.on('click', function(event) {
+			event.preventDefault();
+
+			$.get('/budget/remove', {uname: currentUser, cname: budget.cname}, function(data) {
+				if (data !== "probably removed.") {
+					alert("bad things happend. everything is horrible.");
+				} else {
+					for (var i = 0; i < budgets.length; i++) {
+						if (budgets[i].cname === budget.cname) {
+							budgets.splice(i, 1);
+							break;
+						}
+					}
+
+					fillBudgetTable();
+				}
+			})
+		});
+
+		row.append($("<td/>").append(link));
+
 		row.appendTo("#budgetTable tbody");
 	});
 }
