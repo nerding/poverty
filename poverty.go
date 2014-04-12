@@ -55,7 +55,7 @@ func main(){
 	m.Get("/data/get", func(params martini.Params, r *http.Request) string {
 		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ?", r.FormValue("uname"))
 		if err != nil {
-			panic(err)
+			log.Println("DATA:GET ERROR Could not query database for data.")
 		}
 		defer rows.Close()
 
@@ -65,12 +65,12 @@ func main(){
 			var d Data
 			err = rows.Scan(&d.Id, &d.Uname, &d.Iname, &d.Date, &d.Amount)
 			if err != nil {
-				panic(err)
+				log.Println("DATA:GET ERROR Could not read returned data rows.")
 			}
 
 			rows2, err := db.Query("SELECT cname FROM categories WHERE tid = ?", d.Id)
 			if err != nil {
-				panic(err)
+				log.Println("DATA:GET ERROR Could not query database for categories.")
 			}
 			defer rows2.Close()
 
@@ -80,7 +80,7 @@ func main(){
 				var cname string
 				err = rows2.Scan(&cname)
 				if err != nil {
-					panic(err)
+					log.Println("DATA:GET ERROR Could not read returned category rows.")
 				}
 				cs = append(cs, cname)
 			}
@@ -98,44 +98,54 @@ func main(){
 	})
 
 	m.Get("/data/add", func(params martini.Params, r *http.Request) string {
+		var id int64
+		id = -1;
+
 		res, err := db.Exec("INSERT INTO data(uname, iname, date, amount) VALUES(?, ?, ?, ?)", r.FormValue("uname"), r.FormValue("iname"), r.FormValue("date"), r.FormValue("amount"))
 		if err != nil {
-			panic(err)
-		}
+			log.Println("DATA::ADD ERROR Unable to insert new record into data table.")
+		} else {
 
-		id, err := res.LastInsertId()
-		if err != nil{
-			panic(err)
-		}
+			id, err = res.LastInsertId()
+			if err != nil{
+				log.Println("DATA::ADD ERROR Unable to get id of inserted row.")
+			}
 
-		cats := strings.Split(r.FormValue("categories"), ",")
+			cats := strings.Split(r.FormValue("categories"), ",")
 
-		for _, cat := range cats{
-			_, err = db.Exec("INSERT INTO categories (tid, cname) SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM categories WHERE tid=? AND cname=?);", id, strings.TrimSpace(cat), id, strings.TrimSpace(cat))
-			if err != nil {
-				panic(err)
+			for _, cat := range cats{
+				_, err = db.Exec("INSERT INTO categories (tid, cname) SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM categories WHERE tid=? AND cname=?);", id, strings.TrimSpace(cat), id, strings.TrimSpace(cat))
+				if err != nil {
+					log.Println("DATA::ADD ERROR Could not insert categories.")
+				}
 			}
 		}
-		
+
 		return "[{\"id\":" + strconv.FormatInt(id, 10) + "}]"
 	})
 
 	m.Get("/data/remove", func(params martini.Params, r *http.Request) string {
+		ret := "\"SUCCESS\""
+
 		_, err := db.Exec("DELETE FROM data WHERE id=?", r.FormValue("id"))
 		if err != nil {
-			panic(err)
+			log.Println("DATA:REMOVE ERROR Could not remove row from database.")
+			ret = "\"FAIL\""
 		}
 
-		return "probably removed."
+		return ret
 	})
 
 	m.Get("/budget/add", func(params martini.Params, r *http.Request) string {
+		ret := "\"SUCCESS\""
+
 		_, err = db.Exec("INSERT INTO budgets (uname, cname, amount) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM budgets WHERE uname=? AND cname=?);", r.FormValue("uname"), r.FormValue("cname"), r.FormValue("amount"), r.FormValue("uname"), r.FormValue("cname"))
 		if err != nil {
-			panic(err)
+			log.Println("BUDGET:ADD ERROR Unable to insert new record into budget table.")
+			ret = "\"FAIL\""
 		}
 
-		return "probably added."
+		return ret
 	})
 
 	m.Get("/budget/get", func(params martini.Params, r *http.Request) string {
@@ -144,7 +154,7 @@ func main(){
 		if r.FormValue("all") == "true" {
 			rows, err := db.Query("SELECT cname, amount FROM budgets WHERE uname = ?", r.FormValue("uname"))
 			if err != nil {
-				panic(err)
+				log.Println("BUDGET:GET ERROR Could not get list of budgets.")
 			}
 			defer rows.Close()
 
@@ -156,7 +166,7 @@ func main(){
 
 				err = rows.Scan(&bud.Cname, &bud.Amount)
 				if err != nil {
-					panic(err)
+					log.Println("BUDGET:GET ERROR Could not read rows of budgets.")
 				}
 
 				buds = append(buds, bud)
@@ -165,14 +175,14 @@ func main(){
 
 			byt, err := json.Marshal(buds)
 			if err != nil {
-				panic(err)
+				log.Println("BUDGET:GET ERROR Could not produce JSON object of budgets.")
 			}
 			resp = string(byt)
 
 		} else {
 			rows, err := db.Query("SELECT amount FROM budgets WHERE uname = ? AND cname = ?", r.FormValue("uname"), r.FormValue("cname"))
 			if err != nil {
-				panic(err)
+				log.Println("BUDGET:GET ERROR Could not get list of budgets.")
 			}
 			defer rows.Close()
 
@@ -185,7 +195,7 @@ func main(){
 
 				err = rows.Scan(&bud.Amount)
 				if err != nil {
-					panic(err)
+					log.Println("BUDGET:GET ERROR Could not read rows of budgets.")
 				}
 
 				buds = append(buds, bud)
@@ -194,7 +204,7 @@ func main(){
 
 			byt, err := json.Marshal(buds)
 			if err != nil {
-				panic(err)
+				log.Println("BUDGET:GET ERROR Could not produce JSON object of budgets.")
 			}
 			resp = string(byt)
 		}
@@ -202,12 +212,15 @@ func main(){
 	})
 
 	m.Get("/budget/remove", func(params martini.Params, r *http.Request) string {
+		ret := "\"SUCCESS\""
+
 		_, err = db.Exec("DELETE FROM budgets WHERE uname=? AND cname=?", r.FormValue("uname"), r.FormValue("cname"))
 		if err != nil {
-			panic(err)
+			log.Println("BUDGET:REMOVE ERROR Could not remove requested budget.")
+			ret = "\"FAIL\""
 		}
 
-		return "probably removed."
+		return ret
 	})
 
 	m.Run()
