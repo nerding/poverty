@@ -35,6 +35,8 @@ $(document).ready(function() {
 		};
 
 		$.get("/data/add", nItem, function() {});
+		balance -= nItem.amount;
+		$("#currentBalance").text("$" + balance);
 
 		var cats = nItem.categories.split(',');
 		$.each(cats, function(i, cat) {
@@ -155,12 +157,15 @@ var addItem = function(item) {
 			if (data !== '"SUCCESS"') {
 				alert("Couldn't remove. Everything's terrible...");
 			} else {
-				$("#" + id).remove();
 
 				for (var i = 0; i < transactions.length; i++) {
-					var curid = (item.date + " " + item.name).replace(/\s+/g, '-');
+					var curid = (transactions[i].date + " " + transactions[i].name).replace(/\s+/g, '-');
 					if (curid === id) {
+						$("#" + id).remove();
+						balance += transactions[i].amount;
+
 						transactions.splice(i, 1);
+
 						break;
 					}
 				}
