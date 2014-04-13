@@ -16,14 +16,14 @@ type Data struct{
 	Uname string `json:"uname"`
 	Iname string `json:"iname"`
 	Date int `json:"date"`
-	Amount float64 `json:"amount"`
+	Amount int `json:"amount"`
 	Categories []string `json:"categories"`
 }
 
 type Budget struct{
 	Uname string `json:"uname"`
 	Cname string `json:"cname"`
-	Amount float64 `json:"amount"`
+	Amount int `json:"amount"`
 }
 
 func main(){
@@ -34,7 +34,7 @@ func main(){
 	}
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY, uname TEXT, date INT, iname TEXT, amount REAL)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY, uname TEXT, date INT, iname TEXT, amount INT)")
 	if err != nil {
 		log.Fatal("Could not create data table in database.")
 	}
@@ -44,7 +44,7 @@ func main(){
 		log.Fatal("Could not create categories table in database.")
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS budgets (uname TEXT, cname TEXT, amount REAL)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS budgets (uname TEXT, cname TEXT, amount INT)")
 	if err != nil {
 		log.Fatal("Could not create budgets table in database.")
 	}
@@ -53,7 +53,7 @@ func main(){
 	m.Use(martini.Static("frontend", martini.StaticOptions{Prefix: "/"}))
 
 	m.Get("/data/get", func(params martini.Params, r *http.Request) string {
-		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ? ORDER BY date ASC ", r.FormValue("uname"))
+		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ? ORDER BY date ASC", r.FormValue("uname"))
 		if err != nil {
 			log.Println("DATA:GET ERROR Could not query database for data.")
 		}
