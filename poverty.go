@@ -135,6 +135,12 @@ func main(){
 			ret = "\"FAIL\""
 		}
 
+		_, err = db.Exec("DELETE FROM categories WHERE tid=?", r.FormValue("id"))
+		if err != nil {
+			log.Println("DATA:REMOVE ERROR Could not remove row from database.")
+			ret = "\"FAIL\""
+		}
+
 		return ret
 	})
 
