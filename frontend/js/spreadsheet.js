@@ -157,11 +157,11 @@ var addItem = function(item) {
 			if (data !== '"SUCCESS"') {
 				alert("Couldn't remove. Everything's terrible...");
 			} else {
-				$("#" + id).remove();
 
 				for (var i = 0; i < transactions.length; i++) {
 					var curid = (transactions[i].date + " " + transactions[i].name).replace(/\s+/g, '-');
 					if (curid === id) {
+						$("#" + id).remove();
 						balance += transactions[i].amount;
 
 						transactions.splice(i, 1);
