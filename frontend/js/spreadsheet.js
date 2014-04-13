@@ -81,7 +81,7 @@ $(document).ready(function() {
 		};
 
 		$.get('/budget/add', nBudget, function(data) {
-			if (data !== "probably added.") {
+			if (data !== '"SUCCESS"') {
 				alert("no confirmation on adding budget. everything is terrible.");
 			} else {
 				budgets.push(nBudget);
@@ -151,7 +151,7 @@ var addItem = function(item) {
 	killer.click(function(event) {
 		event.preventDefault();
 		$.get("/data/remove", {id: item.id}, function(data) {
-			if (data !== "probably removed.") {
+			if (data !== '"SUCCESS"') {
 				alert("Couldn't remove. Everything's terrible...");
 			} else {
 				$("#" + id).remove();
@@ -235,7 +235,7 @@ var fillBudgetTable = function() {
 			event.preventDefault();
 
 			$.get('/budget/remove', {uname: currentUser, cname: budget.cname}, function(data) {
-				if (data !== "probably removed.") {
+				if (data !== '"SUCCESS"') {
 					alert("bad things happend. everything is horrible.");
 				} else {
 					for (var i = 0; i < budgets.length; i++) {
