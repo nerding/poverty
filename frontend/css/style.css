@@ -21,11 +21,35 @@ h1 {
 
 header {
   border-bottom: 5px solid #0d2226; }
-  header h1 {
-    line-height: 1em;
+  header #info {
+    border-bottom: 5px solid #0d2226;
+    display: table;
+    width: 100%; }
+    header #info h1 {
+      line-height: 1em;
+      padding: 0;
+      margin: 20px 0;
+      float: left; }
+    header #info h2 {
+      float: right;
+      text-align: right; }
+  header #navstuff {
+    display: table;
+    width: 100%; }
+  header ul {
+    display: block;
+    margin: 0;
     padding: 0;
-    margin: 20px 0;
-    text-align: center; }
+    list-style: none; }
+    header ul li {
+      display: inline-block;
+      padding: 0 10px; }
+  header nav {
+    float: left;
+    margin-left: -10px; }
+  header #rightNav {
+    float: right;
+    margin-right: -10px; }
 
 table {
   width: 100%; }

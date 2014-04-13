@@ -2,6 +2,7 @@ var currentUser;
 var transactions = [];
 var categories = [];
 var budgets = [];
+var balance = 0;
 
 $(document).ready(function() {
 	if (localStorage.getItem("user") === null) {
@@ -185,11 +186,14 @@ var getInfo = function() {
 	transactions = [];
 	categories = [];
 	budgets = [];
+	balance = 0;
 
 	$.getJSON('/data/get', { uname: currentUser }, function(data) {
 		transactions = data;
 
 		$.each(transactions, function(i, item) {
+			balance -= item.amount;
+
 			$.each(item.categories, function(j, cat) {
 				if ($.inArray(cat, categories) === -1) {
 					categories.push(cat);
@@ -201,6 +205,8 @@ var getInfo = function() {
 		fillCategories();
 
 		fillTable();
+
+		$("#currentBalance").text("$" + balance);
 	});
 
 	$.getJSON('/budget/get', { uname: currentUser, all: "true" }, function(data) {
@@ -229,6 +235,16 @@ var fillBudgetTable = function() {
 		var row = $("<tr/>");
 		row.append($("<td/>").text(budget.cname));
 		row.append($("<td/>").text("$" + budget.amount));
+
+		var used = 0;
+		$.each(transactions, function(j, item) {
+			if ($.inArray(budget.cname, item.categories) !== -1) {
+				used += item.amount;
+			}
+		});
+
+		row.append($("<td/>").text(used));
+		row.append($("<td/>").text(budget.amount - used));
 
 		var link = $("<a/>", {href: "#"}).text("-");
 		link.on('click', function(event) {
