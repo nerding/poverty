@@ -9,7 +9,6 @@ import (
 	"strings"
 	"log"
 	"strconv"
-	"time"
 )
 
 type Data struct{
@@ -54,7 +53,7 @@ func main(){
 	m.Use(martini.Static("frontend", martini.StaticOptions{Prefix: "/"}))
 
 	m.Get("/data/get", func(params martini.Params, r *http.Request) string {
-		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ?", r.FormValue("uname"))
+		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ? ORDER BY date ASC ", r.FormValue("uname"))
 		if err != nil {
 			log.Println("DATA:GET ERROR Could not query database for data.")
 		}
