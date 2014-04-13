@@ -12,65 +12,78 @@
 
 <div class="container">
 	<header>
-		<h1>poverty</h1>
+		<div id="info">
+			<h1>poverty</h1>
+			<h2 id="currentBalance"></h2>
+		</div>
 
-		<nav>
-			<ul>
-				<li><a href="#transactions">transactions</a></li>
-				<li><a href="#budget">budget</a></li>
-			</ul>
-		</nav>
-		<ul><li><a href="#" id="changeUser">logout</a></li>
+		<div id="navstuff">
+			<nav>
+				<ul>
+					<li><a href="#transactions">transactions</a></li>
+					<li><a href="#budget">budget</a></li>
+					<li><a href="#summary">summary</a></li>
+				</ul>
+			</nav>
+			<ul id="rightNav"><li><a href="#" id="changeUser">logout</a></li>
+		</div>
 	</header>
 
 	<div id="tabs">
-	<section id="transactions">
-		<table id="purchases">
-			<thead>
-				<tr class="head">
-					<th>Date</th>
-					<th>Name</th>
-					<th>Price</th>
-					<th>Tags</th>
-					<th><a href="#add" id="addItem">+</a></th>
-				</tr>
+		<section id="transactions">
+			<table id="purchases">
+				<thead>
+					<tr class="head">
+						<th>Date</th>
+						<th>Name</th>
+						<th>Price</th>
+						<th>Tags</th>
+						<th><a href="#add" id="addItem">+</a></th>
+					</tr>
 
-				<tr id="newItemRow">
-				<form id="newItem">
-					<td><input type="date" placeholder="date" id="newItemDate" /></td>
-					<td><input type="text" placeholder="name" id="newItemName" /></td>
-					<td>$<input type="text" placeholder="price" id="newItemPrice" /></td>
-					<td><input type="text" placeholder="tags" id="newItemTags" /></td>
-					<td><input type="submit" id="newItemSubmit" value="+" /></td>
-				</form>
-				</tr>
-			</thead>
+					<tr id="newItemRow">
+					<form id="newItem">
+						<td><input type="date" placeholder="date" id="newItemDate" /></td>
+						<td><input type="text" placeholder="name" id="newItemName" /></td>
+						<td>$<input type="text" placeholder="price" id="newItemPrice" /></td>
+						<td><input type="text" placeholder="tags" id="newItemTags" /></td>
+						<td><input type="submit" id="newItemSubmit" value="+" /></td>
+					</form>
+					</tr>
+				</thead>
 
-			<tbody></tbody>
-		</table>
-	</section>
+				<tbody></tbody>
+			</table>
+		</section>
 
-	<section id="budget">
-		<table id="budgetTable">
-			<thead>
-				<tr>
-					<th>category</th>
-					<th>budget</th>
-					<th><a href="#add" id="toggleBudgetForm">+</a></th>
-				<tr>
+		<section id="budget">
+			<table id="budgetTable">
+				<thead>
+					<tr>
+						<th>category</th>
+						<th>budget</th>
+						<th>spent</th>
+						<th>diff</th>
+						<th><a href="#add" id="toggleBudgetForm">+</a></th>
+					<tr>
 
-				<tr id="newBudgetRow">
-				<form id="newBudget">
-					<td><select id="budgetCategories"></select></td>
-					<td><input type="number" id="budgetBudget" placeholder="amount" step="any" /></td>
-					<td><input type="submit" value="+" /></td>
-				</form>
-				</tr>
-			</thead>
+					<tr id="newBudgetRow">
+					<form id="newBudget">
+						<td><select id="budgetCategories"></select></td>
+						<td><input type="number" id="budgetBudget" placeholder="amount" step="any" /></td>
+						<td colspan=2></td>
+						<td><input type="submit" value="+" /></td>
+					</form>
+					</tr>
+				</thead>
 
-			<tbody></tbody>
-		</tabel>
-	</section>
+				<tbody></tbody>
+			</tabel>
+		</section>
+
+		<section id="summary">
+
+		</section>
 	</div>
 </div>
 </body>
