@@ -22,3 +22,5 @@ _testmain.go
 *.exe
 *.test
 *.db
+frontend/js/*flot*
+frontend/flot-test.html

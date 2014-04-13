@@ -3,6 +3,8 @@ var transactions = [];
 var categories = [];
 var budgets = [];
 var balance = 0;
+var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+var startDate = new Date();
 
 $(document).ready(function() {
 	if (localStorage.getItem("user") === null) {
@@ -16,11 +18,20 @@ $(document).ready(function() {
 	// get transactions
 	getInfo();
 
+	makeChart();
+	sumBox();
+
 	// setup the add new item stuff
 	$("#addItem").click(function(event) {
 		event.preventDefault();
 
 		$("#newItemRow").toggle();
+	});
+
+	$("#sumBoxForm").submit(function(event) {
+		event.preventDefault();
+		startDate = new Date($("#sumBoxDate").val());
+		sumBox();
 	});
 
 	$("#newItem").submit(function(event) {
@@ -293,6 +304,62 @@ var showTab = function(section) {
 
 	$("#tabs").find('section').each(function(i, tab) { $(tab).hide(); });
 	$(section).show();
+};
+
+var getBal = function(un, s, e) {
+	bal = 0;
+
+	atStart = false;
+	atEnd = false;
+
+	for(i = 0; i < transactions.length && !atEnd; i++) {
+		if(transactions[i].date.getTime() === s) {
+			atStart = true;
+		}
+
+		if(transactions[i].date.getTime() === e) {
+			atEnd = true;
+		}
+
+		if(atStart && !atEnd) {
+			bal -= transactions[i].amount;
+		}
+	}
+	
+	return bal
+};
+
+var makeChart = function() {
+
+};
+
+var sumBox = function() {
+	$(".sumBox").each(function(index) {
+		m = startDate.getMonth() + index;
+		year = startDate.getFullYear();
+		if(m > 11) {
+			m -= 12;
+			year += 1;
+		}
+		$(this).append("<b>" + months[m] + ", " + year + "</b><br />");
+
+		endm = m + 1;
+		endy = year;
+		if(endm > 11)
+		{
+			endm -= 12;
+			endy += 1;
+		}
+
+		endDate = new Date(endy, endm, startDate.getDate());
+
+		bal = getBal(currentUser, startDate, endDate);
+		alert(bal);
+
+		$(this).append("Income: " + 0 + "<br />");
+		$(this).append("Expenses: " + 0 + "<br />");
+		$(this).append("Monthly Net: " + bal + "<br />");
+	});
 };
 
 window.onpopstate = function() {

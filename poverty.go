@@ -225,5 +225,30 @@ func main(){
 		return ret
 	})
 
+/*	m.Get("/data/balance", func(params martini.Params, r *http.Request) string {
+		bal := ""
+
+		 start, _ := strconv.ParseInt(r.FormValue("start"), 32, 10)
+		 end, _ := strconv.ParseInt(r.FormValue("end"), 32, 10)
+
+		rows, err := db.Query("SELECT SUM(amount) AS balance FROM data WHERE uname = ? AND date > ? AND date < ?", r.FormValue("uname"), start, end)
+		if err != nil {
+			log.Println("DATA:BALANCE ERROR Could not get balance from db.")
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			err = rows.Scan(&bal)
+			if err != nil {
+				log.Println("DATA:BALANCE ERROR Could not read rows of balance query results.")
+				panic(err)
+			}
+		}
+		rows.Close()
+
+		return ">>>" + bal + "<<<"
+
+	});*/
+
 	m.Run()
 }
