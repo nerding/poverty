@@ -1,32 +1,32 @@
 package main
 
 import (
-	"github.com/go-martini/martini"
-	_"github.com/mattn/go-sqlite3"
 	"database/sql"
-	"net/http"
 	"encoding/json"
-	"strings"
+	"github.com/go-martini/martini"
+	_ "github.com/mattn/go-sqlite3"
 	"log"
+	"net/http"
 	"strconv"
+	"strings"
 )
 
-type Data struct{
-	Id int `json:"id"`
-	Uname string `json:"uname"`
-	Iname string `json:"iname"`
-	Date int `json:"date"`
-	Amount int `json:"amount"`
+type Data struct {
+	Id         int      `json:"id"`
+	Uname      string   `json:"uname"`
+	Iname      string   `json:"iname"`
+	Date       int      `json:"date"`
+	Amount     int      `json:"amount"`
 	Categories []string `json:"categories"`
 }
 
-type Budget struct{
-	Uname string `json:"uname"`
-	Cname string `json:"cname"`
-	Amount int `json:"amount"`
+type Budget struct {
+	Uname  string `json:"uname"`
+	Cname  string `json:"cname"`
+	Amount int    `json:"amount"`
 }
 
-func main(){
+func main() {
 
 	db, err := sql.Open("sqlite3", "./poverty.db")
 	if err != nil {
@@ -53,7 +53,7 @@ func main(){
 	m.Use(martini.Static("frontend", martini.StaticOptions{Prefix: "/"}))
 
 	m.Get("/data/get", func(params martini.Params, r *http.Request) string {
-		
+
 		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ? ORDER BY date DESC ", r.FormValue("uname"))
 
 		if err != nil {
@@ -101,7 +101,7 @@ func main(){
 
 	m.Get("/data/add", func(params martini.Params, r *http.Request) string {
 		var id int64
-		id = -1;
+		id = -1
 
 		res, err := db.Exec("INSERT INTO data(uname, iname, date, amount) VALUES(?, ?, ?, ?)", r.FormValue("uname"), r.FormValue("iname"), r.FormValue("date"), r.FormValue("amount"))
 		if err != nil {
@@ -109,13 +109,13 @@ func main(){
 		} else {
 
 			id, err = res.LastInsertId()
-			if err != nil{
+			if err != nil {
 				log.Println("DATA::ADD ERROR Unable to get id of inserted row.")
 			}
 
 			cats := strings.Split(r.FormValue("categories"), ",")
 
-			for _, cat := range cats{
+			for _, cat := range cats {
 				_, err = db.Exec("INSERT INTO categories (tid, cname) SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM categories WHERE tid=? AND cname=?);", id, strings.TrimSpace(cat), id, strings.TrimSpace(cat))
 				if err != nil {
 					log.Println("DATA::ADD ERROR Could not insert categories.")
@@ -216,7 +216,7 @@ func main(){
 			}
 			resp = string(byt)
 		}
-			return string(resp)
+		return string(resp)
 	})
 
 	m.Get("/budget/remove", func(params martini.Params, r *http.Request) string {
