@@ -16,14 +16,14 @@ type Data struct {
 	Uname      string   `json:"uname"`
 	Iname      string   `json:"iname"`
 	Date       int      `json:"date"`
-	Amount     int      `json:"amount"`
+	Amount     float32  `json:"amount"`
 	Categories []string `json:"categories"`
 }
 
 type Budget struct {
-	Uname  string `json:"uname"`
-	Cname  string `json:"cname"`
-	Amount int    `json:"amount"`
+	Uname  string  `json:"uname"`
+	Cname  string  `json:"cname"`
+	Amount float32 `json:"amount"`
 }
 
 func main() {
@@ -34,7 +34,7 @@ func main() {
 	}
 	defer db.Close()
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY, uname TEXT, date INT, iname TEXT, amount INT)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY, uname TEXT, date INTEGER, iname TEXT, amount REAL)")
 	if err != nil {
 		log.Fatal("Could not create data table in database.")
 	}
@@ -44,7 +44,7 @@ func main() {
 		log.Fatal("Could not create categories table in database.")
 	}
 
-	_, err = db.Exec("CREATE TABLE IF NOT EXISTS budgets (uname TEXT, cname TEXT, amount INT)")
+	_, err = db.Exec("CREATE TABLE IF NOT EXISTS budgets (uname TEXT, cname TEXT, amount REAL)")
 	if err != nil {
 		log.Fatal("Could not create budgets table in database.")
 	}
@@ -67,7 +67,7 @@ func main() {
 			var d Data
 			err = rows.Scan(&d.Id, &d.Uname, &d.Iname, &d.Date, &d.Amount)
 			if err != nil {
-				log.Println("DATA:GET ERROR Could not read returned data rows.")
+				log.Println("DATA:GET ERROR Could not read returned data rows.", err)
 			}
 
 			rows2, err := db.Query("SELECT cname FROM categories WHERE tid = ?", d.Id)
