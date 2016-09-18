@@ -1,32 +1,30 @@
 package main
 
 import (
-	"github.com/go-martini/martini"
-	_"github.com/mattn/go-sqlite3"
 	"database/sql"
-	"net/http"
-	"encoding/json"
-	"strings"
+	"github.com/gin-gonic/gin"
+	_ "github.com/mattn/go-sqlite3"
 	"log"
 	"strconv"
+	"strings"
 )
 
-type Data struct{
-	Id int `json:"id"`
-	Uname string `json:"uname"`
-	Iname string `json:"iname"`
-	Date int `json:"date"`
-	Amount int `json:"amount"`
+type Data struct {
+	Id         int      `json:"id"`
+	Uname      string   `json:"uname"`
+	Iname      string   `json:"iname"`
+	Date       int      `json:"date"`
+	Amount     int      `json:"amount"`
 	Categories []string `json:"categories"`
 }
 
-type Budget struct{
-	Uname string `json:"uname"`
-	Cname string `json:"cname"`
-	Amount int `json:"amount"`
+type Budget struct {
+	Uname  string `json:"uname"`
+	Cname  string `json:"cname"`
+	Amount int    `json:"amount"`
 }
 
-func main(){
+func main() {
 
 	db, err := sql.Open("sqlite3", "./poverty.db")
 	if err != nil {
@@ -49,12 +47,13 @@ func main(){
 		log.Fatal("Could not create budgets table in database.")
 	}
 
-	m := martini.Classic()
-	m.Use(martini.Static("frontend", martini.StaticOptions{Prefix: "/"}))
+	r := gin.Default()
+	r.Static("/frontend", "./frontend")
+	r.StaticFile("/", "./frontend/index.html")
 
-	m.Get("/data/get", func(params martini.Params, r *http.Request) string {
-		
-		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ? ORDER BY date DESC ", r.FormValue("uname"))
+	r.GET("/data/get", func(c *gin.Context) {
+
+		rows, err := db.Query("SELECT id, uname, iname, date, amount FROM data WHERE uname = ? ORDER BY date DESC ", c.Request.FormValue("uname"))
 
 		if err != nil {
 			log.Println("DATA:GET ERROR Could not query database for data.")
@@ -94,28 +93,27 @@ func main(){
 		}
 		rows.Close()
 
-		e, _ := json.Marshal(data)
-
-		return string(e)
+		c.JSON(200, data)
 	})
 
-	m.Get("/data/add", func(params martini.Params, r *http.Request) string {
+	r.GET("/data/add", func(c *gin.Context) {
 		var id int64
-		id = -1;
+		id = -1
 
+		r := c.Request
 		res, err := db.Exec("INSERT INTO data(uname, iname, date, amount) VALUES(?, ?, ?, ?)", r.FormValue("uname"), r.FormValue("iname"), r.FormValue("date"), r.FormValue("amount"))
 		if err != nil {
 			log.Println("DATA::ADD ERROR Unable to insert new record into data table.")
 		} else {
 
 			id, err = res.LastInsertId()
-			if err != nil{
+			if err != nil {
 				log.Println("DATA::ADD ERROR Unable to get id of inserted row.")
 			}
 
 			cats := strings.Split(r.FormValue("categories"), ",")
 
-			for _, cat := range cats{
+			for _, cat := range cats {
 				_, err = db.Exec("INSERT INTO categories (tid, cname) SELECT ?, ? WHERE NOT EXISTS (SELECT 1 FROM categories WHERE tid=? AND cname=?);", id, strings.TrimSpace(cat), id, strings.TrimSpace(cat))
 				if err != nil {
 					log.Println("DATA::ADD ERROR Could not insert categories.")
@@ -123,44 +121,42 @@ func main(){
 			}
 		}
 
-		return "[{\"id\":" + strconv.FormatInt(id, 10) + "}]"
+		c.JSON(200, struct{ id string }{strconv.FormatInt(id, 10)})
 	})
 
-	m.Get("/data/remove", func(params martini.Params, r *http.Request) string {
-		ret := "\"SUCCESS\""
-
-		_, err := db.Exec("DELETE FROM data WHERE id=?", r.FormValue("id"))
+	r.GET("/data/remove", func(c *gin.Context) {
+		_, err := db.Exec("DELETE FROM data WHERE id=?", c.Request.FormValue("id"))
 		if err != nil {
 			log.Println("DATA:REMOVE ERROR Could not remove row from database.")
-			ret = "\"FAIL\""
+			c.JSON(500, "FAIL")
+			return
 		}
 
-		_, err = db.Exec("DELETE FROM categories WHERE tid=?", r.FormValue("id"))
+		_, err = db.Exec("DELETE FROM categories WHERE tid=?", c.Request.FormValue("id"))
 		if err != nil {
 			log.Println("DATA:REMOVE ERROR Could not remove row from database.")
-			ret = "\"FAIL\""
+			c.JSON(500, "FAIL")
+			return
 		}
 
-		return ret
+		c.JSON(200, "SUCCESS")
 	})
 
-	m.Get("/budget/add", func(params martini.Params, r *http.Request) string {
-		ret := "\"SUCCESS\""
-
+	r.GET("/budget/add", func(c *gin.Context) {
+		r := c.Request
 		_, err = db.Exec("INSERT INTO budgets (uname, cname, amount) SELECT ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM budgets WHERE uname=? AND cname=?);", r.FormValue("uname"), r.FormValue("cname"), r.FormValue("amount"), r.FormValue("uname"), r.FormValue("cname"))
 		if err != nil {
 			log.Println("BUDGET:ADD ERROR Unable to insert new record into budget table.")
-			ret = "\"FAIL\""
+			c.JSON(500, "FAIL")
+			return
 		}
 
-		return ret
+		c.JSON(200, "SUCCESS")
 	})
 
-	m.Get("/budget/get", func(params martini.Params, r *http.Request) string {
-		var resp string
-
-		if r.FormValue("all") == "true" {
-			rows, err := db.Query("SELECT cname, amount FROM budgets WHERE uname = ?", r.FormValue("uname"))
+	r.GET("/budget/get", func(c *gin.Context) {
+		if c.Request.FormValue("all") == "true" {
+			rows, err := db.Query("SELECT cname, amount FROM budgets WHERE uname = ?", c.Request.FormValue("uname"))
 			if err != nil {
 				log.Println("BUDGET:GET ERROR Could not get list of budgets.")
 			}
@@ -170,7 +166,7 @@ func main(){
 
 			for rows.Next() {
 				var bud Budget
-				bud.Uname = r.FormValue("uname")
+				bud.Uname = c.Request.FormValue("uname")
 
 				err = rows.Scan(&bud.Cname, &bud.Amount)
 				if err != nil {
@@ -181,14 +177,9 @@ func main(){
 			}
 			rows.Close()
 
-			byt, err := json.Marshal(buds)
-			if err != nil {
-				log.Println("BUDGET:GET ERROR Could not produce JSON object of budgets.")
-			}
-			resp = string(byt)
-
+			c.JSON(200, buds)
 		} else {
-			rows, err := db.Query("SELECT amount FROM budgets WHERE uname = ? AND cname = ?", r.FormValue("uname"), r.FormValue("cname"))
+			rows, err := db.Query("SELECT amount FROM budgets WHERE uname = ? AND cname = ?", c.Request.FormValue("uname"), c.Request.FormValue("cname"))
 			if err != nil {
 				log.Println("BUDGET:GET ERROR Could not get list of budgets.")
 			}
@@ -198,8 +189,8 @@ func main(){
 
 			for rows.Next() {
 				var bud Budget
-				bud.Uname = r.FormValue("uname")
-				bud.Cname = r.FormValue("cname")
+				bud.Uname = c.Request.FormValue("uname")
+				bud.Cname = c.Request.FormValue("cname")
 
 				err = rows.Scan(&bud.Amount)
 				if err != nil {
@@ -210,26 +201,20 @@ func main(){
 			}
 			rows.Close()
 
-			byt, err := json.Marshal(buds)
-			if err != nil {
-				log.Println("BUDGET:GET ERROR Could not produce JSON object of budgets.")
-			}
-			resp = string(byt)
+			c.JSON(200, buds)
 		}
-			return string(resp)
 	})
 
-	m.Get("/budget/remove", func(params martini.Params, r *http.Request) string {
-		ret := "\"SUCCESS\""
-
-		_, err = db.Exec("DELETE FROM budgets WHERE uname=? AND cname=?", r.FormValue("uname"), r.FormValue("cname"))
+	r.GET("/budget/remove", func(c *gin.Context) {
+		_, err = db.Exec("DELETE FROM budgets WHERE uname=? AND cname=?", c.Request.FormValue("uname"), c.Request.FormValue("cname"))
 		if err != nil {
 			log.Println("BUDGET:REMOVE ERROR Could not remove requested budget.")
-			ret = "\"FAIL\""
+			c.JSON(500, "FAIL")
+			return
 		}
 
-		return ret
+		c.JSON(200, "SUCCESS")
 	})
 
-	m.Run()
+	r.Run()
 }
